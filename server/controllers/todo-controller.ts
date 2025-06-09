@@ -159,5 +159,38 @@ const updateTodo = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const deleteTodo = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
 
-export { addTodo, listTodos, updateTodo };
+    const deleted = await Todo.findByIdAndDelete(id);
+
+    if (!deleted) {
+      res.status(404).json({
+        status: 404,
+        message: "Todo not found",
+        success: false,
+        data: null,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: "Todo deleted successfully",
+      success: true,
+      data: deleted,
+    });
+  } catch (error) {
+    console.error("Error deleting todo:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Cannot delete todo",
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
+export { addTodo, listTodos, updateTodo, deleteTodo };
