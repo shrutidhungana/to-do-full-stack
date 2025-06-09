@@ -4,3 +4,5 @@ import { addTodo } from "../controllers/todo-controller";
 const router: Router = express.Router();
 
 router.post("/add", addTodo as express.RequestHandler);
+
+export default router;
