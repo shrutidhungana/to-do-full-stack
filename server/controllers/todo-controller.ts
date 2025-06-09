@@ -66,39 +66,51 @@ import Todo, { ITodo } from "../modals/Todo";
    }
  };
 
- const listTodos = async (req: Request, res: Response): Promise<void> => {
-   try {
-     const { filter } = req.query;
+const listTodos = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const filter = req.query.filter as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 5;
+    const skip = (page - 1) * limit;
 
-     let todos;
+    let query = {};
+    const now = new Date();
 
-     if (filter === "done") {
-       todos = await Todo.find({ done: true }).sort({ dateTime: 1 });
-     } else if (filter === "upcoming") {
-       todos = await Todo.find({
-         done: false,
-         dateTime: { $gte: new Date() },
-       }).sort({ dateTime: 1 });
-     } else {
-       todos = await Todo.find().sort({ dateTime: 1 });
-     }
+    if (filter === "done") {
+      query = { done: true };
+    } else if (filter === "upcoming") {
+      query = { done: false, dateTime: { $gt: now } };
+    }
 
-     res.status(200).json({
-       status: 200,
-       message: "Todos fetched successfully",
-       success: true,
-       data: todos,
-     });
-   } catch (error) {
-     console.error("Error fetching todos:", error);
-     res.status(500).json({
-       status: 500,
-       message: "Cannot fetch todos",
-       success: false,
-       data: null,
-     });
-   }
- };
+    const todos = await Todo.find(query)
+      .sort({ dateTime: 1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Todo.countDocuments(query);
+
+    res.status(200).json({
+      status: 200,
+      message: "Todos fetched successfully",
+      success: true,
+      data: {
+        todos,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching todos:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Cannot fetch todos",
+      success: false,
+      data: null,
+    });
+  }
+};
+
 
 const updateTodo = async (req: Request, res: Response): Promise<void> => {
   try {
