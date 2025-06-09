@@ -66,5 +66,39 @@ import Todo, { ITodo } from "../modals/Todo";
    }
  };
 
+ const listTodos = async (req: Request, res: Response): Promise<void> => {
+   try {
+     const { filter } = req.query;
 
-export {addTodo}
+     let todos;
+
+     if (filter === "done") {
+       todos = await Todo.find({ done: true }).sort({ dateTime: 1 });
+     } else if (filter === "upcoming") {
+       todos = await Todo.find({
+         done: false,
+         dateTime: { $gte: new Date() },
+       }).sort({ dateTime: 1 });
+     } else {
+       todos = await Todo.find().sort({ dateTime: 1 });
+     }
+
+     res.status(200).json({
+       status: 200,
+       message: "Todos fetched successfully",
+       success: true,
+       data: todos,
+     });
+   } catch (error) {
+     console.error("Error fetching todos:", error);
+     res.status(500).json({
+       status: 500,
+       message: "Cannot fetch todos",
+       success: false,
+       data: null,
+     });
+   }
+ };
+
+
+export { addTodo, listTodos };
