@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
+import todoRoutes from "./routes/todo-routes";
+
 dotenv.config();
 
 const uri: string = process.env.MONGO_URI ?? "";
@@ -29,6 +31,10 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(express.json());
+
+app.use("/api/todos", todoRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
