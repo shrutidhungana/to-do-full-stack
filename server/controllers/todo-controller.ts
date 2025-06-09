@@ -100,5 +100,64 @@ import Todo, { ITodo } from "../modals/Todo";
    }
  };
 
+const updateTodo = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { name, shortDescription, dateTime, done } = req.body;
 
-export { addTodo, listTodos };
+    if (!name || !shortDescription || !dateTime) {
+      res.status(400).json({
+        status: 400,
+        message: "All fields (name, shortDescription, dateTime) are required",
+        success: false,
+        data: null,
+      });
+      return;
+    }
+
+    const existing = await Todo.findOne({ name, _id: { $ne: id } });
+    if (existing) {
+      res.status(409).json({
+        status: 409,
+        message: "Todo with the same name already exists",
+        success: false,
+        data: null,
+      });
+      return;
+    }
+
+    const updated = await Todo.findByIdAndUpdate(
+      id,
+      { name, shortDescription, dateTime: new Date(dateTime), done },
+      { new: true }
+    );
+
+    if (!updated) {
+      res.status(404).json({
+        status: 404,
+        message: "Todo not found",
+        success: false,
+        data: null,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: "Todo updated successfully",
+      success: true,
+      data: updated,
+    });
+  } catch (error) {
+    console.error("Error updating todo:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Cannot update todo",
+      success: false,
+      data: null,
+    });
+  }
+};
+
+
+export { addTodo, listTodos, updateTodo };
