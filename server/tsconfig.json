@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "rootDir": "./", // Pointing to the root of the server folder
+    "outDir": "./dist", // Redirect output to the 'dist' directory
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "resolveJsonModule": true
+  },
+  "include": ["server.ts", "@types/**/*.d.ts"], // Include server.ts directly
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
