@@ -9,7 +9,7 @@ const PrimaryButton = (props: ButtonProps) => {
       variant="contained"
       color="primary"
       endIcon={<ArrowForward />}
-      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-700 hover:to-blue-700 shadow-lg transition-transform active:scale-95"
+      className="bg-[linear-gradient(135deg,_#6C63FF,_#B44EFF)] hover:bg-[linear-gradient(135deg,_#5A4EE3,_#9E39E8)] text-white shadow-lg transition-transform active:scale-95 rounded-xl px-6 py-2"
       disableElevation
     >
       {props.children}

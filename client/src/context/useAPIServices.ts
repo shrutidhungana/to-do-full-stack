@@ -23,7 +23,7 @@ const {
   data: todosData,
   error: errorTodosData,
   loading: loadingTodosData,
-  fetchData: fetchToDoData,
+  fetchData,
   params: todosParams,
   setParams: setTodosParams,
 } = useGet<ApiResponse<PaginatedTodos>>(list);
@@ -36,7 +36,7 @@ const {
   };
 
   const apiActions: UseTodoApiActions = {
-    fetchData: fetchToDoData,
+     fetchData,
     setParams: setTodosParams,
   };
 
