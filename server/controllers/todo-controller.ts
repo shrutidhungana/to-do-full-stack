@@ -70,7 +70,7 @@ const listTodos = async (req: Request, res: Response): Promise<void> => {
   try {
     const filter = req.query.filter as string;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 5;
+    const limit = parseInt(req.query.limit as string) || 15;
     const skip = (page - 1) * limit;
 
     let query = {};
