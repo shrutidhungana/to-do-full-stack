@@ -22,3 +22,9 @@ export const todoFormControls: FormControl[] = [
   },
  
 ];
+
+export const filterOptions = [
+  { label: "All", value: "all" },
+  { label: "Upcoming", value: "upcoming" },
+  { label: "Done", value: "done" },
+];
