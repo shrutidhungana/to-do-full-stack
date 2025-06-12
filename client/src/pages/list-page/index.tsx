@@ -13,9 +13,8 @@ import { useTodoHandlers } from "../../hooks";
 import TodoList from "./list-item";
 import TodoModals from "./to-do-modals";
 
-type indexProps = {};
 
-const ListPage: React.FC<indexProps> = () => {
+const ListPage: React.FC= () => {
   const {
     todosData,
     drawerOpen,
@@ -114,7 +113,7 @@ const ListPage: React.FC<indexProps> = () => {
           />
         </ReusableDrawer>
       )}
-     <TodoModals />
+     <TodoModals  />
     </>
   );
 };

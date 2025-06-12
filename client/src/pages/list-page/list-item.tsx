@@ -4,15 +4,8 @@ import SkeletonPlaceholder from "../../components/Skeleton";
 import GenericListItem, {type ListItemData } from "../../components/List";
 import { useTodoHandlers } from "../../hooks";
 
-interface TodoListProps {
-  todos: unknown[];
-  loading: boolean;
-  error: boolean;
-  onEdit: (id: string | number) => void;
-  onDelete: (id: string | number) => void;
-}
 
-const TodoList: React.FC<TodoListProps> = () => {
+const TodoList: React.FC = () => {
   const {
     todosData,
     loadingTodosData,

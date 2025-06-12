@@ -1,20 +1,11 @@
 import React from "react";
 import { WarningModal, DeleteModal } from "../../components/Modals";
-import { type Todo } from "../../types";
+
 import { useTodoHandlers } from "../../hooks";
 
-type Props = {
-  showWarningModal: boolean;
-  onCancelWarningModal: () => void;
-  onConfirmDrawerClose: () => void;
 
-  showDeleteModal: boolean;
-  todoToDelete: Todo | null;
-  onCloseDeleteModal: () => void;
-  onConfirmDelete: () => void;
-};
 
-const TodoModals: React.FC<Props> = () => {
+const TodoModals: React.FC = () => {
   const {
     showWarningModal,
     showDeleteModal,
