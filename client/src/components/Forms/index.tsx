@@ -1,13 +1,14 @@
 import React from "react";
-import { Input } from "@mui/material";
+import { Input, Box, Typography } from "@mui/material";
 import { TextareaAutosize } from "@mui/material";
-import SelectDropdown from "../select"
-import {SecondaryButton, PrimaryButton} from "../buttons";
-import { type FormControl as FormControlType } from "../../types"; // assumed custom
+import SelectDropdown from "../Select";
+import { SecondaryButton, PrimaryButton } from "../Buttons";
+import { type FormControl as FormControlType } from "../../types";
 
 type FormProps<T extends Record<string, unknown>> = {
   formControls: (FormControlType & {
     name: string;
+    label?: string;
     placeholder?: string;
     componentType: "input" | "select" | "textarea";
     type?: string;
@@ -46,6 +47,21 @@ const CommonForm = <T extends Record<string, unknown>>({
             placeholder={control.placeholder}
             fullWidth
             value={value}
+            sx={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "8px",
+              padding: "10px 12px",
+              fontSize: "0.95rem",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+              border: "1px solid #E2E8F0",
+              "&:hover": {
+                borderColor: "#CBD5E1",
+              },
+              "&.Mui-focused": {
+                borderColor: "#8B5CF6",
+                boxShadow: "0 0 0 3px rgba(139, 92, 246, 0.2)",
+              },
+            }}
             onChange={(e) =>
               setFormData({ ...formData, [control.name]: e.target.value })
             }
@@ -58,11 +74,23 @@ const CommonForm = <T extends Record<string, unknown>>({
             id={control.name}
             name={control.name}
             placeholder={control.placeholder}
-            className="w-full p-2 border rounded-md resize-y min-h-[80px]"
             value={String(value || "")}
             onChange={(e) =>
               setFormData({ ...formData, [control.name]: e.target.value })
             }
+            style={{
+              width: "100%",
+              padding: "12px",
+              border: "1px solid #E2E8F0",
+              borderRadius: "8px",
+              resize: "vertical",
+              minHeight: "100px",
+              fontSize: "0.95rem",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+              fontFamily: "inherit",
+              color: "#344054",
+            }}
           />
         );
 
@@ -84,17 +112,48 @@ const CommonForm = <T extends Record<string, unknown>>({
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <Box
+      component="form"
+      onSubmit={onSubmit}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        p: 0,
+      }}
+    >
       {formControls?.map((control) => (
-        <div key={control.name} className="flex flex-col gap-1">
-          <label htmlFor={control.name} className="font-medium text-gray-700">
-            {control.label}
-          </label>
+        <Box
+          key={control.name}
+          sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+        >
+          {control.label && (
+            <Typography
+              component="label"
+              htmlFor={control.name}
+              sx={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "#344054",
+              }}
+            >
+              {control.label}
+            </Typography>
+          )}
           {renderInputField(control)}
-        </div>
+        </Box>
       ))}
 
-      <div className="flex gap-3 pt-4">
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 2,
+          pt: 3,
+          borderTop: "1px solid #E5E7EB",
+          mt: "auto",
+        }}
+      >
         {secondaryAction && secondaryButtonText && (
           <SecondaryButton type="button" onClick={secondaryAction}>
             {secondaryButtonText}
@@ -103,8 +162,8 @@ const CommonForm = <T extends Record<string, unknown>>({
         <PrimaryButton type="submit" disabled={isBtnDisabled}>
           {buttonText}
         </PrimaryButton>
-      </div>
-    </form>
+      </Box>
+    </Box>
   );
 };
 

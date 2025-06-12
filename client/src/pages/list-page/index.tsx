@@ -1,15 +1,16 @@
 // ListPage.tsx
 import React, { useEffect, useState } from "react";
 import useTodo from "../../context/useTodo";
-import Header from "../../components/header";
-import { PrimaryButton,  } from "../../components/buttons";
-import SelectDropdown from "../../components/select";
-import GenericListItem, { type ListItemData } from "../../components/list"; 
-import Pagination from "../../components/pagination";
+import Header from "../../components/Header";
+import { PrimaryButton } from "../../components/Buttons";
+import SelectDropdown from "../../components/Select";
+import GenericListItem, { type ListItemData } from "../../components/List";
+import Pagination from "../../components/Pagination";
 import { type SelectChangeEvent, Box, Typography } from "@mui/material";
-import ReusableDrawer from "../../components/drawer";
-import CommonForm from "../../components/forms";
+import ReusableDrawer from "../../components/Drawer";
+import CommonForm from "../../components/Forms";
 import { todoFormControls } from "../../config";
+
 
 type indexProps = {};
 
@@ -20,77 +21,73 @@ const filterOptions = [
 ];
 
 const ListPage: React.FC<indexProps> = () => {
-  const [{ todosData, loadingTodosData, errorTodosData, success, error }, { fetchData, saveToDoData }] =
-    useTodo();
+  const [
+    { todosData, loadingTodosData, errorTodosData, success, error },
+    { fetchData, saveToDoData },
+  ] = useTodo();
 
- 
   const [filter, setFilter] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     dueDate: "",
-   
   });
-  
+
   useEffect(() => {
     fetchData({ filter, page, limit: 5 });
   }, [filter, page]);
 
-  
   const handleFilterChange = (e: SelectChangeEvent) => {
     const newFilter = e.target.value;
     setFilter(newFilter);
-    setPage(1); 
+    setPage(1);
   };
 
- 
   const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
 
   const handleAddClick = () => {
-     setDrawerOpen(true);
+    setDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
-     setFormData({
-       name: "",
-       description: "",
-       dueDate: "",
-      
-     });
-     setDrawerOpen(false);
-   };
-  
-const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault(); 
+    setFormData({
+      name: "",
+      description: "",
+      dueDate: "",
+    });
+    setDrawerOpen(false);
+  };
 
-  try {
-    const payload = {
-      name: formData.name.trim(),
-      shortDescription: formData.description.trim(),
-      dateTime: new Date(formData.dueDate).toISOString(),
-    };
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    const response = await saveToDoData(payload); // Custom hook should return server response
+    try {
+      const payload = {
+        name: formData.name.trim(),
+        shortDescription: formData.description.trim(),
+        dateTime: new Date(formData.dueDate).toISOString(),
+      };
 
-    if (response?.success) {
-      success(response.message || "Todo added successfully");
-      setDrawerOpen(false);
-      setFormData({ name: "", description: "", dueDate: ""});
-      setPage(1); // Go to first page
-      fetchData({ filter, page: 1, limit: 5 }); 
-    } else {
-      error(response?.message ?? "Failed to add todo");
+      const response = await saveToDoData(payload); // Custom hook should return server response
+
+      if (response?.success) {
+        success(response.message || "Todo added successfully");
+        setDrawerOpen(false);
+        setFormData({ name: "", description: "", dueDate: "" });
+        setPage(1); // Go to first page
+        fetchData({ filter, page: 1, limit: 5 });
+      } else {
+        error(response?.message ?? "Failed to add todo");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Unexpected error occurred");
     }
-  } catch (err) {
-    console.error(err);
-    alert("Unexpected error occurred");
-  }
-};
-
+  };
 
   return (
     <>
@@ -212,7 +209,7 @@ const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             buttonText="Add"
             secondaryAction={handleDrawerClose}
             secondaryButtonText="Cancel"
-            isBtnDisabled={false} 
+            isBtnDisabled={false}
           />
         </ReusableDrawer>
       )}
