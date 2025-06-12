@@ -3,10 +3,10 @@ import Todo, { ITodo } from "../modals/Todo";
 
  const addTodo = async (req: Request, res: Response): Promise<void| Response> => {
    try {
-     const { name, shortDescription, dateTime } = req.body;
+     const { name, shortDescription, dateTime, status } = req.body;
 
      // Server-side validation
-     if (!name || !shortDescription || !dateTime) {
+     if (!name || !shortDescription || !dateTime || !status) {
        return res.status(400).json({
          status: 400,
          message: "All fields are required",

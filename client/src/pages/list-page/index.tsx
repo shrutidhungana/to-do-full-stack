@@ -2,11 +2,14 @@
 import React, { useEffect, useState } from "react";
 import useTodo from "../../context/useTodo";
 import Header from "../../components/header";
-import { PrimaryButton } from "../../components/buttons";
+import { PrimaryButton, SecondaryButton } from "../../components/buttons";
 import SelectDropdown from "../../components/select";
-import GenericListItem, { type ListItemData } from "../../components/list"; // Ensure this is the refined GenericListItem
+import GenericListItem, { type ListItemData } from "../../components/list"; 
 import Pagination from "../../components/pagination";
-import { type SelectChangeEvent, Box, Typography } from "@mui/material"; // Import Box and Typography from MUI
+import { type SelectChangeEvent, Box, Typography } from "@mui/material";
+import ReusableDrawer from "../../components/drawer";
+import CommonForm from "../../components/forms";
+import { todoFormControls } from "../../config";
 
 type indexProps = {};
 
@@ -23,7 +26,13 @@ const ListPage: React.FC<indexProps> = () => {
  
   const [filter, setFilter] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-
+   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    dueDate: "",
+    status: "",
+  });
   
   useEffect(() => {
     fetchData({ filter, page, limit: 5 });
@@ -42,10 +51,22 @@ const ListPage: React.FC<indexProps> = () => {
   };
 
   const handleAddClick = () => {
-    
+     setDrawerOpen(true);
   };
 
+   const handleDrawerClose = () => {
+     setDrawerOpen(false);
+   };
   
+  const handleFormSubmit = (formData: Record<string, unknown>) => {
+     
+     console.log("Form submitted with data:", formData);
+    setFormData({ name: "", description: "", dueDate: "", status: "" });
+     setDrawerOpen(false);
+
+
+   };
+
 
   return (
     <>
@@ -136,13 +157,13 @@ const ListPage: React.FC<indexProps> = () => {
         <Box
           sx={{
             position: "fixed",
-            bottom: 0, 
-            width: "100%", 
+            bottom: 0,
+            width: "100%",
             display: "flex",
             justifyContent: "center",
             py: 2,
-            backgroundColor: "rgba(255, 255, 255, 0.8)", 
-            backdropFilter: "blur(5px)", 
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backdropFilter: "blur(5px)",
             zIndex: 1000, // Ensure it stays on top
           }}
         >
@@ -152,6 +173,24 @@ const ListPage: React.FC<indexProps> = () => {
             onChange={handlePageChange}
           />
         </Box>
+      )}
+      {drawerOpen && (
+        <ReusableDrawer
+          open={drawerOpen}
+          onClose={handleDrawerClose}
+          title="Add To Do"
+        >
+          <CommonForm
+            formControls={todoFormControls}
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleFormSubmit}
+            buttonText="Add"
+            secondaryAction={handleDrawerClose}
+            secondaryButtonText="Cancel"
+            isBtnDisabled={false} // Add validation logic here if needed
+          />
+        </ReusableDrawer>
       )}
     </>
   );
