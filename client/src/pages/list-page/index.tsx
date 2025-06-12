@@ -11,6 +11,7 @@ import ReusableDrawer from "../../components/Drawer";
 import CommonForm from "../../components/Forms";
 import { todoFormControls } from "../../config";
 import { WarningModal } from "../../components/Modals";
+import type { Todo } from "../../types";
 
 
 
@@ -25,7 +26,7 @@ const filterOptions = [
 const ListPage: React.FC<indexProps> = () => {
   const [
     { todosData, loadingTodosData, errorTodosData, success, error },
-    { fetchData, saveToDoData },
+    { fetchData, saveToDoData, updateToDoData },
   ] = useTodo();
 
   const [filter, setFilter] = useState<string>("");
@@ -37,6 +38,8 @@ const ListPage: React.FC<indexProps> = () => {
     dueDate: "",
   });
   const [showWarningModal, setShowWarningModal] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const isEditMode = Boolean(selectedTodo);
 
   useEffect(() => {
     fetchData({ filter, page, limit: 5 });
@@ -53,21 +56,46 @@ const ListPage: React.FC<indexProps> = () => {
   };
 
   const handleAddClick = () => {
+    setSelectedTodo(null); // reset for add
+    setFormData({ name: "", description: "", dueDate: "" });
     setDrawerOpen(true);
   };
 
- const handleDrawerCloseInitiate = () => {
-   const isFormEmpty =
-     !formData.name.trim() &&
-     !formData.description.trim() &&
-     !formData.dueDate.trim();
-   if (isFormEmpty) {
-     handleConfirmDrawerClose(); 
-   } else {
-     setShowWarningModal(true); 
-   }
- };
+  const handleEdit = (id: string | number) => {
+    const todo = todosData?.data?.todos.find((t) => t._id === id);
+    if (todo) {
+      setSelectedTodo(todo);
+      setFormData({
+        name: todo.name,
+        description: todo.shortDescription || "",
+        dueDate: todo.dateTime
+          ? new Date(todo.dateTime).toISOString().slice(0, 16)
+          : "", // for input[type=datetime-local]
+      });
+      setDrawerOpen(true);
+    }
+  };
 
+  const isFormDirty = () => {
+    if (!selectedTodo) {
+      return formData.name || formData.description || formData.dueDate;
+    }
+
+    return (
+      formData.name !== selectedTodo.name ||
+      formData.description !== (selectedTodo.shortDescription || "") ||
+      formData.dueDate !==
+        new Date(selectedTodo.dateTime).toISOString().slice(0, 16)
+    );
+  };
+
+ const handleDrawerCloseInitiate = () => {
+  if (!isFormDirty()) {
+    handleConfirmDrawerClose();
+  } else {
+    setShowWarningModal(true);
+  }
+};
    const handleConfirmDrawerClose = () => {
      setFormData({
        name: "",
@@ -75,6 +103,7 @@ const ListPage: React.FC<indexProps> = () => {
        dueDate: "",
      });
      setDrawerOpen(false);
+     setSelectedTodo(null);
      setShowWarningModal(false); 
    };
   
@@ -85,30 +114,61 @@ const ListPage: React.FC<indexProps> = () => {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+     if (
+       !formData.name.trim() ||
+       !formData.description.trim() ||
+       !formData.dueDate
+     ) {
+       error("All fields are required");
+       return;
+     }
+
+     const date = new Date(formData.dueDate);
+     if (isNaN(date.getTime())) {
+       error("Invalid due date");
+       return;
+     }
+
+    const payload = {
+      name: formData.name.trim(),
+      shortDescription: formData.description.trim(),
+      dateTime: new Date(formData.dueDate).toISOString(),
+    };
 
     try {
-      const payload = {
-        name: formData.name.trim(),
-        shortDescription: formData.description.trim(),
-        dateTime: new Date(formData.dueDate).toISOString(),
-      };
-
-      const response = await saveToDoData(payload); // Custom hook should return server response
-
-      if (response?.success) {
-        success(response.message || "Todo added successfully");
-        setDrawerOpen(false);
-        setFormData({ name: "", description: "", dueDate: "" });
-        setPage(1); // Go to first page
-        fetchData({ filter, page: 1, limit: 5 });
+      if (isEditMode && selectedTodo) {
+        
+        const response = await updateToDoData(payload, {
+          id: selectedTodo._id,
+        });
+        if (response?.success) {
+          success(response.message || "Todo updated successfully");
+        } else {
+          error(response?.message ?? "Failed to update todo");
+          return;
+        }
       } else {
-        error(response?.message ?? "Failed to add todo");
+        const response = await saveToDoData(payload);
+       
+        if (response?.success) {
+          success(response.message || "Todo added successfully");
+        } else {
+          error(response?.message ?? "Failed to add todo");
+          return;
+        }
       }
+
+      setDrawerOpen(false);
+      setSelectedTodo(null);
+      setFormData({ name: "", description: "", dueDate: "" });
+      setPage(1);
+      fetchData({ filter, page: 1, limit: 5 });
     } catch (err) {
       console.error(err);
       alert("Unexpected error occurred");
     }
   };
+
 
   return (
     <>
@@ -181,7 +241,7 @@ const ListPage: React.FC<indexProps> = () => {
                     <GenericListItem
                       key={todo._id}
                       item={itemData}
-                      onEdit={(id) => alert(`Edit ${id}`)}
+                      onEdit={handleEdit}
                       onDelete={(id) => alert(`Delete ${id}`)}
                     />
                   );
@@ -220,14 +280,14 @@ const ListPage: React.FC<indexProps> = () => {
         <ReusableDrawer
           open={drawerOpen}
           onClose={handleConfirmDrawerClose}
-          title="Add To Do"
+          title={isEditMode ? "Update To Do" : "Add To Do"}
         >
           <CommonForm
             formControls={todoFormControls}
             formData={formData}
             setFormData={setFormData}
             onSubmit={handleFormSubmit}
-            buttonText="Add"
+            buttonText={isEditMode ? "Update" : "Add"}
             secondaryAction={handleDrawerCloseInitiate}
             secondaryButtonText="Cancel"
             isBtnDisabled={false}
@@ -237,13 +297,13 @@ const ListPage: React.FC<indexProps> = () => {
       {showWarningModal && (
         <WarningModal
           open={showWarningModal}
-          onClose={handleCancelWarningModal} 
+          onClose={handleCancelWarningModal}
           title="Discard Changes?"
           question="Are you sure you want to discard these changes?"
           additionalText="Any unsaved progress will be lost. You will not be able to see them again."
           onConfirm={handleConfirmDrawerClose}
           confirmText="Yes, Discard"
-          onCancel={handleCancelWarningModal} 
+          onCancel={handleCancelWarningModal}
           cancelText="No, Keep Editing"
         />
       )}

@@ -49,8 +49,14 @@ const useUpdate = <T = unknown>(
       if (onSuccess) onSuccess(response.data);
       return response.data;
     } catch (err: unknown) {
-      setError(err);
-      if (onFailure) onFailure(err);
+      let errorMessage = "Unknown error";
+      if (axios.isAxiosError(err)) {
+        errorMessage =
+          err.response?.data?.message ?? err.message ?? "Axios error occurred";
+      }
+
+      setError(errorMessage);
+      if (onFailure) onFailure(errorMessage);
     } finally {
       setLoading(false);
     }
