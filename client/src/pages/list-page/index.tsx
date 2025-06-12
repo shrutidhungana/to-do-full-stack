@@ -10,6 +10,8 @@ import { type SelectChangeEvent, Box, Typography } from "@mui/material";
 import ReusableDrawer from "../../components/Drawer";
 import CommonForm from "../../components/Forms";
 import { todoFormControls } from "../../config";
+import { WarningModal } from "../../components/Modals";
+
 
 
 type indexProps = {};
@@ -34,6 +36,7 @@ const ListPage: React.FC<indexProps> = () => {
     description: "",
     dueDate: "",
   });
+  const [showWarningModal, setShowWarningModal] = useState(false);
 
   useEffect(() => {
     fetchData({ filter, page, limit: 5 });
@@ -53,14 +56,32 @@ const ListPage: React.FC<indexProps> = () => {
     setDrawerOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setFormData({
-      name: "",
-      description: "",
-      dueDate: "",
-    });
-    setDrawerOpen(false);
+ const handleDrawerCloseInitiate = () => {
+   const isFormEmpty =
+     !formData.name.trim() &&
+     !formData.description.trim() &&
+     !formData.dueDate.trim();
+   if (isFormEmpty) {
+     handleConfirmDrawerClose(); 
+   } else {
+     setShowWarningModal(true); 
+   }
+ };
+
+   const handleConfirmDrawerClose = () => {
+     setFormData({
+       name: "",
+       description: "",
+       dueDate: "",
+     });
+     setDrawerOpen(false);
+     setShowWarningModal(false); 
+   };
+  
+  const handleCancelWarningModal = () => {
+    setShowWarningModal(false);
   };
+
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -198,7 +219,7 @@ const ListPage: React.FC<indexProps> = () => {
       {drawerOpen && (
         <ReusableDrawer
           open={drawerOpen}
-          onClose={handleDrawerClose}
+          onClose={handleConfirmDrawerClose}
           title="Add To Do"
         >
           <CommonForm
@@ -207,11 +228,24 @@ const ListPage: React.FC<indexProps> = () => {
             setFormData={setFormData}
             onSubmit={handleFormSubmit}
             buttonText="Add"
-            secondaryAction={handleDrawerClose}
+            secondaryAction={handleDrawerCloseInitiate}
             secondaryButtonText="Cancel"
             isBtnDisabled={false}
           />
         </ReusableDrawer>
+      )}
+      {showWarningModal && (
+        <WarningModal
+          open={showWarningModal}
+          onClose={handleCancelWarningModal} 
+          title="Discard Changes?"
+          question="Are you sure you want to discard these changes?"
+          additionalText="Any unsaved progress will be lost. You will not be able to see them again."
+          onConfirm={handleConfirmDrawerClose}
+          confirmText="Yes, Discard"
+          onCancel={handleCancelWarningModal} 
+          cancelText="No, Keep Editing"
+        />
       )}
     </>
   );
