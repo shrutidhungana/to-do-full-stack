@@ -1,6 +1,6 @@
 // GenericListItem.tsx
 import React from "react";
-import { IconButton, Tooltip, Typography, Checkbox } from "@mui/material";
+import { IconButton, Tooltip, Typography} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
