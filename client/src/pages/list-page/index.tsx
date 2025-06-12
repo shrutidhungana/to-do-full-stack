@@ -18,7 +18,7 @@ import type { Todo } from "../../types";
 type indexProps = {};
 
 const filterOptions = [
-  { label: "All", value: "" },
+  { label: "All", value: "all" },
   { label: "Upcoming", value: "upcoming" },
   { label: "Done", value: "done" },
 ];
@@ -29,13 +29,14 @@ const ListPage: React.FC<indexProps> = () => {
     { fetchData, saveToDoData, updateToDoData, deleteToDoData },
   ] = useTodo();
 
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string>("all");
   const [page, setPage] = useState<number>(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     dueDate: "",
+    done: false,
   });
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
@@ -44,7 +45,7 @@ const ListPage: React.FC<indexProps> = () => {
   const isEditMode = Boolean(selectedTodo);
 
   useEffect(() => {
-    fetchData({ filter, page, limit: 5 });
+    fetchData({ filter: filter === "all" ? "" : filter, page, limit: 5 });
   }, [filter, page]);
 
   const handleFilterChange = (e: SelectChangeEvent) => {
@@ -292,7 +293,7 @@ const handleDeleteClick = (id: string | number) => {
           )}
         </Box>
       </main>
-      {todosData && todosData?.data?.totalPages > 1 && (
+      {todosData && todosData?.data?.totalPages  && (
         <Box
           sx={{
             position: "fixed",

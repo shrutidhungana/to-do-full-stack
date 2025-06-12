@@ -1,88 +1,96 @@
 import { Request, Response } from "express";
 import Todo, { ITodo } from "../modals/Todo";
 
- const addTodo = async (req: Request, res: Response): Promise<void| Response> => {
-   try {
-     const { name, shortDescription, dateTime,  } = req.body;
+const addTodo = async (
+  req: Request,
+  res: Response
+): Promise<void | Response> => {
+  try {
+    const { name, shortDescription, dateTime } = req.body;
 
-     // Server-side validation
-     if (!name || !shortDescription || !dateTime ) {
-       return res.status(400).json({
-         status: 400,
-         message: "All fields are required",
-         success: false,
-         data: null,
-       });
-     }
+    // Server-side validation
+    if (!name || !shortDescription || !dateTime) {
+      return res.status(400).json({
+        status: 400,
+        message: "All fields are required",
+        success: false,
+        data: null,
+      });
+    }
 
-     if (isNaN(Date.parse(dateTime))) {
-       return res.status(400).json({
-         status: 400,
-         message: "Invalid dateTime format",
-         success: false,
-         data: null,
-       });
-     }
+    if (isNaN(Date.parse(dateTime))) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid dateTime format",
+        success: false,
+        data: null,
+      });
+    }
 
-     // Check for duplicate: same name and dateTime
-     const existingTodo = await Todo.findOne({
-       name: name.trim(),
-       dateTime: new Date(dateTime),
-     });
+    // Check for duplicate: same name and dateTime
+    const existingTodo = await Todo.findOne({
+      name: name.trim(),
+      dateTime: new Date(dateTime),
+    });
 
-     if (existingTodo) {
-       return res.status(409).json({
-         status: 409,
-         message: "Duplicate todo item exists with the same name and date/time",
-         success: false,
-         data: null,
-       });
-     }
+    if (existingTodo) {
+      return res.status(409).json({
+        status: 409,
+        message: "Duplicate todo item exists with the same name and date/time",
+        success: false,
+        data: null,
+      });
+    }
 
-     const todoData: Partial<ITodo> = {
-       name: name.trim(),
-       shortDescription: shortDescription.trim(),
-       dateTime: new Date(dateTime),
-       done: false,
-     };
+    // Determine if done based on dateTime (past => done: true, future => done: false)
+    const todoDate = new Date(dateTime);
+    const done = todoDate.getTime() < new Date().getTime();
 
-     const todo = new Todo(todoData);
-     const savedTodo = await todo.save();
+    const todoData: Partial<ITodo> = {
+      name: name.trim(),
+      shortDescription: shortDescription.trim(),
+      dateTime: todoDate,
+      done,
+    };
 
-     return res.status(201).json({
-       status: 201,
-       message: "Todo added successfully",
-       success: true,
-       data: savedTodo,
-     });
-   } catch (error) {
-     console.error("Error adding todo:", error);
-     return res.status(500).json({
-       status: 500,
-       message: "Cannot add todo",
-       success: false,
-       data: null,
-     });
-   }
- };
+    const todo = new Todo(todoData);
+    const savedTodo = await todo.save();
+
+    return res.status(201).json({
+      status: 201,
+      message: "Todo added successfully",
+      success: true,
+      data: savedTodo,
+    });
+  } catch (error) {
+    console.error("Error adding todo:", error);
+    return res.status(500).json({
+      status: 500,
+      message: "Cannot add todo",
+      success: false,
+      data: null,
+    });
+  }
+};
 
 const listTodos = async (req: Request, res: Response): Promise<void> => {
   try {
     const filter = req.query.filter as string;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 15;
+    const limit = parseInt(req.query.limit as string) || 5;
     const skip = (page - 1) * limit;
 
     let query = {};
-    const now = new Date();
 
     if (filter === "done") {
       query = { done: true };
     } else if (filter === "upcoming") {
-      query = { done: false, dateTime: { $gt: now } };
+      query = { done: false };
+    } else if (filter === "all" || !filter) {
+      query = {};
     }
 
-    const todos = await Todo.find()
+    const todos = await Todo.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -111,11 +119,10 @@ const listTodos = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 const updateTodo = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, shortDescription, dateTime, done } = req.body;
+    const { name, shortDescription, dateTime } = req.body;
 
     if (!name || !shortDescription || !dateTime) {
       res.status(400).json({
@@ -138,9 +145,13 @@ const updateTodo = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Determine if done based on dateTime (past => done: true, future => done: false)
+    const todoDate = new Date(dateTime);
+    const done = todoDate.getTime() < new Date().getTime();
+
     const updated = await Todo.findByIdAndUpdate(
       id,
-      { name, shortDescription, dateTime: new Date(dateTime), done },
+      { name, shortDescription, dateTime: todoDate, done },
       { new: true }
     );
 
@@ -203,6 +214,5 @@ const deleteTodo = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
-
 
 export { addTodo, listTodos, updateTodo, deleteTodo };
