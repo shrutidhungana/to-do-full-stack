@@ -1,12 +1,12 @@
 import { useState } from "react";
-import axios, {type  AxiosRequestConfig, } from "axios";
+import axios, {type AxiosRequestConfig } from "axios";
 
 type Params = Record<string, string | number>;
 type OnSuccess<T> = (data: T) => void;
 type OnFailure = (error: unknown) => void;
 
-interface UseSaveReturn<T> {
-  saveData: (
+interface UseUpdateReturn<T> {
+  updateData: (
     payload: unknown,
     params?: Params,
     onSuccess?: OnSuccess<T>,
@@ -17,15 +17,15 @@ interface UseSaveReturn<T> {
   error: unknown;
 }
 
-const useSave = <T = unknown>(
+const useUpdate = <T = unknown>(
   endpoint: string,
   options: AxiosRequestConfig = {}
-): UseSaveReturn<T> => {
+): UseUpdateReturn<T> => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<unknown>(null);
 
-  const saveData = async (
+  const updateData = async (
     payload: unknown,
     params: Params = {},
     onSuccess?: OnSuccess<T>,
@@ -43,7 +43,7 @@ const useSave = <T = unknown>(
         );
       });
 
-      const response = await axios.post<T>(dynamicEndpoint, payload, options);
+      const response = await axios.put<T>(dynamicEndpoint, payload, options);
       setData(response.data);
 
       if (onSuccess) onSuccess(response.data);
@@ -62,7 +62,7 @@ const useSave = <T = unknown>(
     }
   };
 
-  return { saveData, loading, data, error };
+  return { updateData, loading, data, error };
 };
 
-export default useSave;
+export default useUpdate;

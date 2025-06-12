@@ -1,5 +1,5 @@
 
-import {useGet, useSave} from "../hooks";
+import {useGet, useSave, useUpdate} from "../hooks";
 import type { ApiResponse, PaginatedTodos, Todo } from "../types";
 import { apiEndpoints } from "../utils/api";
 
@@ -20,12 +20,18 @@ export interface UseTodoApiActions {
     onSuccess?: (data: ApiResponse<Todo>) => void,
     onFailure?: (error: unknown) => void
   ) => Promise<ApiResponse<Todo> | void>;
+  updateToDoData: (
+    payload: unknown,
+    params?: Record<string, string | number>,
+    onSuccess?: (data: ApiResponse<Todo>) => void,
+    onFailure?: (error: unknown) => void
+  ) => Promise<ApiResponse<Todo> | void>;
 }
 
 const useTodoAPIServices = (): [UseTodoApiState, UseTodoApiActions] => {
  
     
-    const {list, add} = apiEndpoints
+    const {list, add, update} = apiEndpoints
 const {
   data: todosData,
   error: errorTodosData,
@@ -40,7 +46,7 @@ const {
    
   } = useSave<ApiResponse<Todo>>(add);
 
-  
+  const { updateData: updateToDoData } = useUpdate<ApiResponse<Todo>>(update);
 
   const apiState: UseTodoApiState = {
     todosData,
@@ -52,9 +58,10 @@ const {
   
 
   const apiActions: UseTodoApiActions = {
-     fetchData,
+    fetchData,
     setParams: setTodosParams,
     saveToDoData,
+    updateToDoData,
   };
 
   return [apiState, apiActions];
