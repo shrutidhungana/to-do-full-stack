@@ -22,3 +22,12 @@ export type ApiResponse<T> = {
   success: boolean;
   data: T;
 };
+
+export type FormControl = {
+  name: string;
+  label: string;
+  placeholder?: string;
+  componentType: "input" | "select" | "textarea";
+  type?: string;
+  options?: { label: string, value: string }[];
+};
