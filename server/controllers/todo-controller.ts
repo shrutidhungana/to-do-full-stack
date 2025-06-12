@@ -3,10 +3,10 @@ import Todo, { ITodo } from "../modals/Todo";
 
  const addTodo = async (req: Request, res: Response): Promise<void| Response> => {
    try {
-     const { name, shortDescription, dateTime, status } = req.body;
+     const { name, shortDescription, dateTime,  } = req.body;
 
      // Server-side validation
-     if (!name || !shortDescription || !dateTime || !status) {
+     if (!name || !shortDescription || !dateTime ) {
        return res.status(400).json({
          status: 400,
          message: "All fields are required",
@@ -82,8 +82,8 @@ const listTodos = async (req: Request, res: Response): Promise<void> => {
       query = { done: false, dateTime: { $gt: now } };
     }
 
-    const todos = await Todo.find(query)
-      .sort({ dateTime: 1 })
+    const todos = await Todo.find()
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 

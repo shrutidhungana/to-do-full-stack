@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import useTodo from "../../context/useTodo";
 import Header from "../../components/header";
-import { PrimaryButton, SecondaryButton } from "../../components/buttons";
+import { PrimaryButton,  } from "../../components/buttons";
 import SelectDropdown from "../../components/select";
 import GenericListItem, { type ListItemData } from "../../components/list"; 
 import Pagination from "../../components/pagination";
@@ -20,7 +20,7 @@ const filterOptions = [
 ];
 
 const ListPage: React.FC<indexProps> = () => {
-  const [{ todosData, loadingTodosData, errorTodosData }, { fetchData }] =
+  const [{ todosData, loadingTodosData, errorTodosData, success, error }, { fetchData, saveToDoData }] =
     useTodo();
 
  
@@ -31,7 +31,7 @@ const ListPage: React.FC<indexProps> = () => {
     name: "",
     description: "",
     dueDate: "",
-    status: "",
+   
   });
   
   useEffect(() => {
@@ -54,18 +54,42 @@ const ListPage: React.FC<indexProps> = () => {
      setDrawerOpen(true);
   };
 
-   const handleDrawerClose = () => {
+  const handleDrawerClose = () => {
+     setFormData({
+       name: "",
+       description: "",
+       dueDate: "",
+      
+     });
      setDrawerOpen(false);
    };
   
-  const handleFormSubmit = (formData: Record<string, unknown>) => {
-     
-     console.log("Form submitted with data:", formData);
-    setFormData({ name: "", description: "", dueDate: "", status: "" });
-     setDrawerOpen(false);
+const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault(); 
 
+  try {
+    const payload = {
+      name: formData.name.trim(),
+      shortDescription: formData.description.trim(),
+      dateTime: new Date(formData.dueDate).toISOString(),
+    };
 
-   };
+    const response = await saveToDoData(payload); // Custom hook should return server response
+
+    if (response?.success) {
+      success(response.message || "Todo added successfully");
+      setDrawerOpen(false);
+      setFormData({ name: "", description: "", dueDate: ""});
+      setPage(1); // Go to first page
+      fetchData({ filter, page: 1, limit: 5 }); 
+    } else {
+      error(response?.message ?? "Failed to add todo");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Unexpected error occurred");
+  }
+};
 
 
   return (
@@ -188,7 +212,7 @@ const ListPage: React.FC<indexProps> = () => {
             buttonText="Add"
             secondaryAction={handleDrawerClose}
             secondaryButtonText="Cancel"
-            isBtnDisabled={false} // Add validation logic here if needed
+            isBtnDisabled={false} 
           />
         </ReusableDrawer>
       )}

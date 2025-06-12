@@ -1,6 +1,6 @@
 
-import {useGet} from "../hooks";
-import type { ApiResponse, PaginatedTodos } from "../types";
+import {useGet, useSave} from "../hooks";
+import type { ApiResponse, PaginatedTodos, Todo } from "../types";
 import { apiEndpoints } from "../utils/api";
 
 export interface UseTodoApiState {
@@ -8,17 +8,24 @@ export interface UseTodoApiState {
   loadingTodosData: boolean;
   errorTodosData: string | null;
   todosParams: Record<string, unknown>;
+  
 }
 
 export interface UseTodoApiActions {
   fetchData: (params?: Record<string, unknown>) => Promise<void>;
   setParams: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
+  saveToDoData: (
+    payload: unknown,
+    params?: Record<string, string | number>,
+    onSuccess?: (data: ApiResponse<Todo>) => void,
+    onFailure?: (error: unknown) => void
+  ) => Promise<ApiResponse<Todo> | void>;
 }
 
 const useTodoAPIServices = (): [UseTodoApiState, UseTodoApiActions] => {
-    // Pass '/list' as URL param to useGet
+ 
     
-    const {list} = apiEndpoints
+    const {list, add} = apiEndpoints
 const {
   data: todosData,
   error: errorTodosData,
@@ -27,6 +34,13 @@ const {
   params: todosParams,
   setParams: setTodosParams,
 } = useGet<ApiResponse<PaginatedTodos>>(list);
+  
+  const {
+    saveData: saveToDoData,
+   
+  } = useSave<ApiResponse<Todo>>(add);
+
+  
 
   const apiState: UseTodoApiState = {
     todosData,
@@ -35,9 +49,12 @@ const {
     todosParams,
   };
 
+  
+
   const apiActions: UseTodoApiActions = {
      fetchData,
     setParams: setTodosParams,
+    saveToDoData,
   };
 
   return [apiState, apiActions];

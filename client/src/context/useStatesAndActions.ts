@@ -3,10 +3,21 @@ import useAPIServices, {
   type UseTodoApiActions,
 } from "./useAPIServices";
 
-const useStatesAndActions = (): [UseTodoApiState, UseTodoApiActions] => {
-  const [apiState, apiActions] = useAPIServices();
+import { useToast } from "../hooks";
 
-  return [apiState, apiActions];
+interface ExtendedTodoApiState extends UseTodoApiState {
+  success: (msg: string) => void;
+  error: (msg: string) => void;
+}
+
+const useStatesAndActions = (): [ExtendedTodoApiState, UseTodoApiActions] => {
+  const [apiState, apiActions] = useAPIServices();
+  const { success, error } = useToast();
+
+  const state = { success, error, ...apiState };
+  const action = { ...apiActions };
+
+  return [state, action];
 };
 
 export default useStatesAndActions;
