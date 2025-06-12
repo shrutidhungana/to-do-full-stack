@@ -5,7 +5,7 @@ export const todoFormControls: FormControl[] = [
     name: "name",
     label: "Name",
     componentType: "input",
-    placeholder: "Enter your name",
+    placeholder: "Enter the To Do ",
     type: "text",
   },
   {
@@ -20,14 +20,5 @@ export const todoFormControls: FormControl[] = [
     componentType: "input",
     type: "datetime-local",
   },
-  {
-    name: "status",
-    label: "Status",
-    componentType: "select",
-    options: [
-      { label: "Done", value: "done" },
-      { label: "Upcoming", value: "upcoming" },
-    ],
-    placeholder: "Select status",
-  },
+ 
 ];
