@@ -10,7 +10,7 @@ import { type SelectChangeEvent, Box, Typography } from "@mui/material";
 import ReusableDrawer from "../../components/Drawer";
 import CommonForm from "../../components/Forms";
 import { todoFormControls } from "../../config";
-import { WarningModal } from "../../components/Modals";
+import { WarningModal, DeleteModal } from "../../components/Modals";
 import type { Todo } from "../../types";
 
 
@@ -26,7 +26,7 @@ const filterOptions = [
 const ListPage: React.FC<indexProps> = () => {
   const [
     { todosData, loadingTodosData, errorTodosData, success, error },
-    { fetchData, saveToDoData, updateToDoData },
+    { fetchData, saveToDoData, updateToDoData, deleteToDoData },
   ] = useTodo();
 
   const [filter, setFilter] = useState<string>("");
@@ -39,6 +39,8 @@ const ListPage: React.FC<indexProps> = () => {
   });
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null);
   const isEditMode = Boolean(selectedTodo);
 
   useEffect(() => {
@@ -110,6 +112,41 @@ const ListPage: React.FC<indexProps> = () => {
   const handleCancelWarningModal = () => {
     setShowWarningModal(false);
   };
+
+const handleDeleteClick = (id: string | number) => {
+  const todo = todosData?.data?.todos.find((t) => t._id === id);
+  if (todo) {
+    setTodoToDelete(todo);
+    setShowDeleteModal(true);
+  }
+};
+  
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setTodoToDelete(null);
+  };
+
+ 
+  const handleConfirmDelete = async () => {
+    if (!todoToDelete) return;
+
+    try {
+      const response = await deleteToDoData({id: todoToDelete._id } );
+      if (response?.success) {
+        success(response.message || "Todo deleted successfully");
+        fetchData({ filter, page, limit: 5 }); 
+      } else {
+        error(response?.message ?? "Failed to delete todo");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      error("Unexpected error while deleting");
+    } finally {
+      setShowDeleteModal(false);
+      setTodoToDelete(null);
+    }
+  };
+
 
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -242,7 +279,7 @@ const ListPage: React.FC<indexProps> = () => {
                       key={todo._id}
                       item={itemData}
                       onEdit={handleEdit}
-                      onDelete={(id) => alert(`Delete ${id}`)}
+                      onDelete={() => handleDeleteClick(todo._id)}
                     />
                   );
                 })
@@ -305,6 +342,18 @@ const ListPage: React.FC<indexProps> = () => {
           confirmText="Yes, Discard"
           onCancel={handleCancelWarningModal}
           cancelText="No, Keep Editing"
+        />
+      )}
+      {todoToDelete && (
+        <DeleteModal
+          open={showDeleteModal}
+          onClose={handleCloseDeleteModal}
+          title="Delete Todo?"
+          question={`Are you sure you want to delete "${todoToDelete.name}"?`}
+          onConfirm={handleConfirmDelete}
+          confirmText="Delete"
+          onCancel={handleCloseDeleteModal}
+          cancelText="Cancel"
         />
       )}
     </>

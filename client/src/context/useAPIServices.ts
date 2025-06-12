@@ -1,5 +1,5 @@
 
-import {useGet, useSave, useUpdate} from "../hooks";
+import {useGet, useSave, useUpdate, useDelete} from "../hooks";
 import type { ApiResponse, PaginatedTodos, Todo } from "../types";
 import { apiEndpoints } from "../utils/api";
 
@@ -26,12 +26,17 @@ export interface UseTodoApiActions {
     onSuccess?: (data: ApiResponse<Todo>) => void,
     onFailure?: (error: unknown) => void
   ) => Promise<ApiResponse<Todo> | void>;
+  deleteToDoData: (
+    params: Record<string, string | number>,
+    onSuccess?: (data: ApiResponse<Todo>) => void,
+    onFailure?: (error: unknown) => void
+  ) => Promise<ApiResponse<Todo> | void>;
 }
 
 const useTodoAPIServices = (): [UseTodoApiState, UseTodoApiActions] => {
  
     
-    const {list, add, update} = apiEndpoints
+    const { list, add, update, deleteToDo } = apiEndpoints;
 const {
   data: todosData,
   error: errorTodosData,
@@ -47,6 +52,7 @@ const {
   } = useSave<ApiResponse<Todo>>(add);
 
   const { updateData: updateToDoData } = useUpdate<ApiResponse<Todo>>(update);
+  const { deleteData: deleteToDoData } = useDelete<ApiResponse<Todo>>(deleteToDo);
 
   const apiState: UseTodoApiState = {
     todosData,
@@ -62,6 +68,7 @@ const {
     setParams: setTodosParams,
     saveToDoData,
     updateToDoData,
+    deleteToDoData
   };
 
   return [apiState, apiActions];
