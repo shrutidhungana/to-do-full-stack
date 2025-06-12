@@ -12,6 +12,7 @@ import CommonForm from "../../components/Forms";
 import { todoFormControls } from "../../config";
 import { WarningModal, DeleteModal } from "../../components/Modals";
 import type { Todo } from "../../types";
+import SkeletonPlaceholder from "../../components/Skeleton";
 
 
 
@@ -36,7 +37,7 @@ const ListPage: React.FC<indexProps> = () => {
     name: "",
     description: "",
     dueDate: "",
-    done: false,
+    
   });
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
@@ -249,9 +250,13 @@ const handleDeleteClick = (id: string | number) => {
           }}
         >
           {loadingTodosData ? (
-            <Typography className="text-white text-center">
-              Loading todos...
-            </Typography>
+            <SkeletonPlaceholder
+              variant="rectangular"
+              width="100%"
+              height={80}
+              count={5}
+              className="rounded-lg"
+            />
           ) : errorTodosData ? (
             <Typography className="text-red-500 text-center">
               Error loading todos
@@ -293,7 +298,7 @@ const handleDeleteClick = (id: string | number) => {
           )}
         </Box>
       </main>
-      {todosData && todosData?.data?.totalPages  && (
+      {todosData && todosData?.data?.totalPages && (
         <Box
           sx={{
             position: "fixed",
