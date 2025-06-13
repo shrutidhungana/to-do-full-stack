@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global base styles */
+
 html,
 body,
 #root {
@@ -25,13 +25,13 @@ body,
   box-sizing: border-box;
 }
 
-/* Improve focus outlines for better UX */
+
 :focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
-/* Smooth transition for UI */
+
 button,
 input,
 textarea,

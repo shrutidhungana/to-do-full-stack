@@ -4,7 +4,7 @@ import SkeletonPlaceholder from "../../components/Skeleton";
 import GenericListItem, {type ListItemData } from "../../components/List";
 import { useTodoHandlers } from "../../hooks";
 import Empty from "../../components/Empty";
-
+import { motion } from "framer-motion";
 const TodoList: React.FC = () => {
   const {
     todosData,
@@ -39,7 +39,7 @@ const TodoList: React.FC = () => {
   if (todosData?.data?.todos?.length) {
     return (
       <>
-        {todosData.data.todos.map((todo) => {
+        {todosData.data.todos.map((todo, index) => {
           const status: "done" | "upcoming" | undefined =
             todo.done === true
               ? "done"
@@ -55,13 +55,22 @@ const TodoList: React.FC = () => {
             status,
           };
 
+          const isEven = index % 2 === 0;
+          const directionX = isEven ? -50 : 50;
+
           return (
-            <GenericListItem
+            <motion.div
               key={todo._id}
-              item={itemData}
-              onEdit={handleEdit}
-              onDelete={() => handleDeleteClick(todo._id)}
-            />
+              initial={{ opacity: 0, x: directionX }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <GenericListItem
+                item={itemData}
+                onEdit={handleEdit}
+                onDelete={() => handleDeleteClick(todo._id)}
+              />
+            </motion.div>
           );
         })}
       </>
