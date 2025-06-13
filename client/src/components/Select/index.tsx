@@ -22,21 +22,21 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
   onChange,
   className,
 }) => {
-  const menuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: 250,
-        background:
-          "linear-gradient(135deg, rgba(63,81,181,0.95), rgba(103,58,183,0.95))",
-        color: "white",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.22)",
-        borderRadius: 8,
-      },
-    },
-    anchorOrigin: { vertical: "bottom", horizontal: "left" },
-    transformOrigin: { vertical: "top", horizontal: "left" },
-    getContentAnchorEl: null as unknown,
-  };
+ const menuProps = {
+   PaperProps: {
+     style: {
+       maxHeight: 250,
+       background:
+         "linear-gradient(135deg, rgba(63,81,181,0.95), rgba(103,58,183,0.95))",
+       color: "white",
+       boxShadow: "0 4px 8px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.22)",
+       borderRadius: 8,
+     },
+   },
+   anchorOrigin: { vertical: "bottom", horizontal: "left" } as const,
+   transformOrigin: { vertical: "top", horizontal: "left" } as const,
+   getContentAnchorEl: null,
+ };
 
   return (
     <FormControl
