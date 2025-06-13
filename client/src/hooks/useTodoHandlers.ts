@@ -1,5 +1,5 @@
-// hooks/useTodoHandlers.ts
-import { useEffect } from "react";
+
+
 import useTodo from "../context/useTodo";
 import {type  SelectChangeEvent } from "@mui/material";
 
@@ -37,9 +37,7 @@ import {type  SelectChangeEvent } from "@mui/material";
     },
   ] = useTodo();
 
-  useEffect(() => {
-    fetchData({ filter: filter === "all" ? "" : filter, page, limit: 5 });
-  }, [filter, page]);
+ 
 
   const handleFilterChange = (e: SelectChangeEvent) => {
     const newFilter = e.target.value;
@@ -203,7 +201,8 @@ import {type  SelectChangeEvent } from "@mui/material";
     showDeleteModal,
       todoToDelete,
       filter,
-      page,
+    page,
+      fetchData,
     setFormData,
     handleFilterChange,
     handlePageChange,

@@ -30,11 +30,10 @@ const TodoList: React.FC = () => {
         Error loading todos
       </Typography>
     );
-  } else {
-    if (todosData?.data?.todos?.length) {
+  } else if (todosData?.data?.todos?.length) {
       return (
         <>
-          {todosData.data.todos.map((todo) => {
+          {todosData?.data.todos?.map((todo) => {
             const status: "done" | "upcoming" | undefined =
               todo.done === true
                 ? "done"
@@ -43,19 +42,19 @@ const TodoList: React.FC = () => {
                 : undefined;
 
             const itemData: ListItemData = {
-              id: todo._id,
-              name: todo.name,
-              description: todo.shortDescription,
-              dateTime: todo.dateTime,
+              id: todo?._id,
+              name: todo?.name,
+              description: todo?.shortDescription,
+              dateTime: todo?.dateTime,
               status,
             };
 
             return (
               <GenericListItem
-                key={todo._id}
+                key={todo?._id}
                 item={itemData}
                 onEdit={handleEdit}
-                onDelete={() => handleDeleteClick(todo._id)}
+                onDelete={() => handleDeleteClick(todo?._id)}
               />
             );
           })}
@@ -68,7 +67,6 @@ const TodoList: React.FC = () => {
         </Typography>
       );
     }
-  }
 };
 
 export default TodoList;

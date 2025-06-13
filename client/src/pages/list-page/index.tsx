@@ -1,5 +1,5 @@
 // ListPage.tsx
-import React from "react";
+import React, {useEffect} from "react";
 import Header from "../../components/Header";
 import { PrimaryButton } from "../../components/Buttons";
 import SelectDropdown from "../../components/Select";
@@ -29,7 +29,12 @@ const ListPage: React.FC= () => {
     handleDrawerCloseInitiate,
     handleConfirmDrawerClose,
     handleFormSubmit,
+    fetchData,
   } = useTodoHandlers();
+
+   useEffect(() => {
+     fetchData({ filter: filter === "all" ? "" : filter, page, limit: 5 });
+   }, [filter, page]);
 
   return (
     <>
@@ -85,11 +90,11 @@ const ListPage: React.FC= () => {
             py: 2,
             backgroundColor: "rgba(255, 255, 255, 0.8)",
             backdropFilter: "blur(5px)",
-            zIndex: 1000, // Ensure it stays on top
+            zIndex: 1000, 
           }}
         >
           <Pagination
-            count={todosData.data.totalPages}
+            count={todosData?.data.totalPages}
             page={page}
             onChange={handlePageChange}
           />
