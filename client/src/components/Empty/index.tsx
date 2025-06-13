@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   Card,
   CardContent,
   Typography,
@@ -8,6 +7,7 @@ import {
   DialogTitle,
   DialogContent,
 } from "@mui/material";
+import { PrimaryButton } from "../Buttons";
 
 type EmptyProps = {
   title: string;
@@ -26,13 +26,7 @@ const Empty: React.FC<EmptyProps> = ({
 }) => {
   const renderButton = () =>
     buttonText && (
-      <Button
-        variant="outlined"
-        className="mt-4 text-black border-gray-300 hover:bg-gray-100"
-        onClick={onButtonClick}
-      >
-        {buttonText}
-      </Button>
+      <PrimaryButton onClick={onButtonClick}>{buttonText}</PrimaryButton>
     );
 
   if (variant === "card") {
@@ -99,7 +93,8 @@ const Empty: React.FC<EmptyProps> = ({
       <div>
         <Typography variant="h6" className="text-black">
           {title}
-        </Typography>
+              </Typography>
+              
         {description && (
           <Typography variant="body2" className="text-gray-700 mt-2">
             {description}
