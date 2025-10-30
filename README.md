@@ -43,4 +43,4 @@ ALL, Done, Upcoming determined on the basis of DateAnd time) and Add To Do butto
 
 **To know more about the application, you can click on the link below:**
 
-**https://proshore-to-do.vercel.app/todo**
+**https://to-do-full-stack-one.vercel.app**
